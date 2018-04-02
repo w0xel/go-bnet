@@ -1,4 +1,4 @@
-package bnet
+package client
 
 import (
 	"net/http"

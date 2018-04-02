@@ -1,12 +1,16 @@
 package profile
 
 import (
-	"github.com/mitchellh/go-bnet"
+	"github.com/w0xel/go-bnet/client"
 )
 
 // AccountService has account-related APIs. See Client.
 type AccountService struct {
-	client *Client
+	client *client.Client
+}
+
+func NewAccountService(c *client.Client) *AccountService {
+	return &AccountService{client: c}
 }
 
 // User represents the user information for a Battle.net account
@@ -16,7 +20,7 @@ type User struct {
 }
 
 // User calls the /account/user endpoint. See Battle.net docs.
-func (s *AccountService) User() (*User, *bnet.Response, error) {
+func (s *AccountService) User() (*User, *client.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/user", nil)
 	if err != nil {
 		return nil, nil, err

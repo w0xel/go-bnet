@@ -1,23 +1,21 @@
-package sc2
+package bnet
 
 import (
 	"fmt"
 	"strings"
 	"net/http"
 	"net/url"
-	"github.com/mitchellh/go-bnet"
+	"github.com/w0xel/go-bnet/client"
+	"github.com/w0xel/go-bnet/profile"
 )
+
 
 const (
 	libraryVersion = "0.1"
 	userAgent      = "go-bnet/" + libraryVersion
 )
 
-// Client is the API client for Battle.net. Create this using NewClient.
-// This can also be constructed manually but it isn't recommended.
-type Client struct {
-	bnet.Client
-}
+type Client client.Client;
 
 // NewClient creates a new Battle.net client.
 //
@@ -35,9 +33,9 @@ func NewClient(region string, c *http.Client) *Client {
 	}
 
 	// Determine the API base URL based on the region
-	baseURLStr := fmt.Sprintf("https://%s.api.battle.net/sc2/", region)
+	baseURLStr := fmt.Sprintf("https://%s.api.battle.net/", region)
 	if region == "cn" {
-		baseURLStr = "https://api.battlenet.com.cn/sc2/"
+		baseURLStr = "https://api.battlenet.com.cn/"
 	}
 
 	baseURL, err := url.Parse(baseURLStr)
@@ -47,15 +45,23 @@ func NewClient(region string, c *http.Client) *Client {
 		panic(err)
 	}
 	return &Client{
-		Client: bnet.Client{
-			Client:    c,
-			BaseURL:   baseURL,
-			UserAgent: userAgent,
-		},
+		Client:    c,
+
+		BaseURL:   baseURL,
+
+		UserAgent: userAgent,
 	}
 }
 
-// Profile is the hook to a Starcraft 2 Profile service.
-func (c *Client) Profile() *ProfileService {
-	return &ProfileService{client: c}
+
+// Hook to Account service.
+func (c Client) Account() *profile.AccountService {
+	cClient := client.Client(c)
+	return profile.NewAccountService(&cClient)
+}
+
+// Hook to Profile service.
+func (c Client) Profile() *profile.ProfileService {
+	cClient := client.Client(c)
+	return profile.NewProfile(&cClient)
 }
