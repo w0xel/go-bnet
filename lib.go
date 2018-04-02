@@ -65,3 +65,8 @@ func (c Client) Profile() *profile.ProfileService {
 	cClient := client.Client(c)
 	return profile.NewProfile(&cClient)
 }
+
+func (c Client) BnetClient() *client.Client {
+	cClient := client.Client(c)
+	return &cClient
+}
