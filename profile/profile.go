@@ -1,17 +1,17 @@
 package profile
 
 import (
-	"github.com/w0xel/go-bnet/client"
+	"github.com/w0xel/go-bnet/internal"
 	"github.com/w0xel/go-bnet/sc2"
 	"github.com/w0xel/go-bnet/wow"
 )
 
 // ProfileService has OAuth Profile APIs. See Client.
 type ProfileService struct {
-	client *client.Client
+	client *internal.Client
 }
 
-func NewProfile(c *client.Client) *ProfileService {
+func NewProfile(c *internal.Client) *ProfileService {
 	return &ProfileService{client: c}
 }
 
@@ -27,7 +27,7 @@ type WoWProfile struct {
 
 // SC2() calls the /sc2/profile/user endpoint. This endpoint uses OAuth2
 // to retrieve a user's Starcraft 2 profile. See Battle.net docs.
-func (s *ProfileService) SC2() (*SC2Profile, *client.Response, error) {
+func (s *ProfileService) SC2() (*SC2Profile, *internal.Response, error) {
 	req, err := s.client.NewRequest("GET", "sc2/profile/user", nil)
 	if err != nil {
 		return nil, nil, err
@@ -44,7 +44,7 @@ func (s *ProfileService) SC2() (*SC2Profile, *client.Response, error) {
 
 // WoW() calls the /wow/user/characters endpoint. This endpoint uses OAuth2
 // to retrieve a user's World of Warcraft character list. See Battle.net docs.
-func (s *ProfileService) WoW() (*WoWProfile, *client.Response, error) {
+func (s *ProfileService) WoW() (*WoWProfile, *internal.Response, error) {
 	req, err := s.client.NewRequest("GET", "wow/user/characters", nil)
 	if err != nil {
 		return nil, nil, err

@@ -5,8 +5,9 @@ import (
 	"strings"
 	"net/http"
 	"net/url"
-	"github.com/w0xel/go-bnet/client"
+	"github.com/w0xel/go-bnet/internal"
 	"github.com/w0xel/go-bnet/profile"
+	"github.com/w0xel/go-bnet/wow"
 )
 
 
@@ -15,7 +16,9 @@ const (
 	userAgent      = "go-bnet/" + libraryVersion
 )
 
-type Client client.Client;
+type Client struct {
+	internalClient internal.Client
+}
 
 // NewClient creates a new Battle.net client.
 //
@@ -25,7 +28,7 @@ type Client client.Client;
 // The http.Client argument should usually be retrieved via the
 // oauth2 Go library NewClient function. It must be a client that
 // automatically injects authentication details into requests.
-func NewClient(region string, c *http.Client) *Client {
+func NewClient(region string, c *http.Client, apikey string) *Client {
 	region = strings.ToLower(region)
 
 	if c == nil {
@@ -45,28 +48,37 @@ func NewClient(region string, c *http.Client) *Client {
 		panic(err)
 	}
 	return &Client{
-		Client:    c,
+		internalClient: internal.Client {
+			Client:		c,
+			
+			BaseURL:	baseURL,
+			
+			UserAgent:	userAgent,
 
-		BaseURL:   baseURL,
-
-		UserAgent: userAgent,
+			ApiKey: 	apikey,
+		},
 	}
 }
 
 
 // Hook to Account service.
-func (c Client) Account() *profile.AccountService {
-	cClient := client.Client(c)
-	return profile.NewAccountService(&cClient)
+func (c * Client) Account() *profile.AccountService {
+	return profile.NewAccountService(&c.internalClient)
 }
 
 // Hook to Profile service.
-func (c Client) Profile() *profile.ProfileService {
-	cClient := client.Client(c)
-	return profile.NewProfile(&cClient)
+func (c * Client) Profile() *profile.ProfileService {
+	return profile.NewProfile(&c.internalClient)
 }
 
-func (c Client) BnetClient() *client.Client {
-	cClient := client.Client(c)
-	return &cClient
+func (c * Client) Wow() *wow.WowService {
+	return wow.NewService(&c.internalClient)
+}
+
+func (c * Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	return c.internalClient.NewRequest(method, urlStr, body)
+}
+
+func (c * Client) Do(req *http.Request, v interface{}) (*internal.Response, error) {
+	return c.internalClient.Do(req, v)
 }

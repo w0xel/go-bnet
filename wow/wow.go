@@ -28,5 +28,9 @@ type Spec struct {
 	Order           int    `json:"order"`
 }
 
-
-
+type Class struct {
+	Id 			int 	`json:"id"`
+	Mask 		int		`json:"mask"`
+	PowerType	string 	`json:"powerType"`
+	Name 		string 	`json:"name"`
+}

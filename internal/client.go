@@ -1,4 +1,4 @@
-package client
+package internal
 
 import (
 	"bytes"
@@ -23,6 +23,9 @@ type Client struct {
 
 	// UserAgent is the user agent to set on API requests.
 	UserAgent string
+
+	// ApiKey for class without token
+	ApiKey string
 }
 
 // NewRequest creates an API request. A relative URL can be provided in urlStr,
@@ -34,6 +37,14 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(rel.RawQuery) > 0 {
+		rel.RawQuery += "&apikey="
+		rel.RawQuery += c.ApiKey
+	} else {
+		rel.RawQuery = "apikey="
+		rel.RawQuery += c.ApiKey
 	}
 
 	u := c.BaseURL.ResolveReference(rel)
@@ -66,7 +77,10 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 // interface, the raw response body will be written to v, without attempting to
 // first decode it.
 func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
-	resp, err := c.Client.Do(req)
+	return Do(req, v, c.Client)
+}
+func Do(req *http.Request, v interface{}, client *http.Client) (*Response, error) {
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}

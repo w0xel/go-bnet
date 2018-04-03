@@ -2,11 +2,17 @@ package sc2
 
 import (
 	"fmt"
-	"github.com/w0xel/go-bnet/client"
+	"github.com/w0xel/go-bnet/internal"
 )
 
-type ProfileService struct {
-	client *client.Client
+type SC2Service struct {
+	client *internal.Client
+}
+
+func NewService(client * internal.Client) *SC2Service {
+	return &SC2Service {
+		client: client,
+	}
 }
 
 // TODO: Create type to hold information about an individual SC2 profile's ladders.
@@ -28,7 +34,7 @@ type Matches struct {
 
 // Matches(:id, :realm, :name) calls the /sc2/profile/:id/:realm/:name/matches endpoint.
 // This provides data about an individual SC2 profile's match history.
-func (s *ProfileService) Matches(id int, realm int, name string) (*Matches, *client.Response, error) {
+func (s *SC2Service) Matches(id int, realm int, name string) (*Matches, *internal.Response, error) {
 	url := fmt.Sprintf("profile/%d/%d/%s/matches", id, realm, name)
 	req, err := s.client.NewRequest("GET", url, nil)
 	if err != nil {
